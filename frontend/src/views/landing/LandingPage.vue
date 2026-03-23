@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="top">
     <!-- Navbar -->
     <v-app-bar color="primary" elevation="0" style="position: fixed; z-index: 100;">
       <v-app-bar-title>
@@ -7,9 +7,16 @@
         <span class="ml-2 text-caption" style="color: #C8941A;">RESTAURANT</span>
       </v-app-bar-title>
       <v-spacer />
+      <v-btn variant="text" color="white" href="#top">Bosh sahifa</v-btn>
       <v-btn variant="text" color="white" href="#menu">Menyu</v-btn>
       <v-btn variant="text" color="white" href="#about">Haqimizda</v-btn>
-      <v-btn variant="text" color="white" href="#contact">Kontakt</v-btn>
+      <v-btn variant="text" color="white" href="#contact">Bog'lanish</v-btn>
+      <v-btn variant="text" color="white" href="https://travel.oldkhiva.uz" target="_blank" rel="noopener">
+        <v-icon start size="small">mdi-airplane</v-icon>Travel
+      </v-btn>
+      <v-btn variant="text" color="white" href="https://bicycle.oldkhiva.uz" target="_blank" rel="noopener">
+        <v-icon start size="small">mdi-bicycle</v-icon>Bicycle
+      </v-btn>
       <v-btn color="accent" to="/login" class="ml-2">Kirish</v-btn>
       <v-btn variant="outlined" color="white" to="/register" class="ml-2 mr-3">Ro'yhatdan o'tish</v-btn>
     </v-app-bar>
@@ -179,7 +186,7 @@
           <v-col cols="12" md="8">
             <v-card height="300" class="overflow-hidden">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2959.5!2d60.3627!3d41.3775!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDHCsDIyJzM5LjAiTiA2MMKwMjEnNDUuNyJF!5e0!3m2!1sen!2s!4v1234567890"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d500!2d60.375575!3d41.374735!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f18!3m3!1m2!1s0x0%3A0x0!2zNDHCsDIyJzI5LjAiTiA2MMKwMjInMzIuMSJF!5e0!3m2!1sen!2s!4v1234567890"
                 width="100%"
                 height="300"
                 style="border: 0;"
