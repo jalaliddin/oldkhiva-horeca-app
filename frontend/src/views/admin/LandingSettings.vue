@@ -52,6 +52,28 @@
           <v-text-field v-model="settings.partnership_title" label="Hamkorlik sarlavhasi" class="mb-3" />
           <v-textarea v-model="settings.partnership_text" label="Hamkorlik matni" rows="3" class="mb-4" />
 
+          <!-- Brand text -->
+          <div class="text-subtitle-2 font-weight-bold mb-2">Brend nomi (navbar va footer)</div>
+          <v-row dense class="mb-4">
+            <v-col cols="12" md="6">
+              <v-text-field v-model="settings.brand_name" label="Asosiy nom (masalan: OLDKHIVA)" density="compact" />
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field v-model="settings.brand_tagline" label="Qo'shimcha (masalan: RESTAURANT)" density="compact" />
+            </v-col>
+          </v-row>
+
+          <!-- Logo -->
+          <div class="text-subtitle-2 font-weight-bold mb-2">Logo</div>
+          <div v-if="settings.logo_image" class="d-flex align-center gap-3 mb-3">
+            <v-img :src="`/storage/${settings.logo_image}`" height="60" max-width="200" contain class="bg-grey-lighten-4 rounded-lg flex-grow-0" style="border: 1px solid #eee;" />
+            <v-btn color="error" variant="tonal" size="small" :loading="removingLogo" @click="removeLogo">
+              <v-icon start size="small">mdi-delete</v-icon>O'chirish
+            </v-btn>
+          </div>
+          <v-file-input v-model="logoImageFile" label="Logo yuklash (PNG/SVG)" accept="image/*" prepend-icon="mdi-image" class="mb-2" />
+          <v-btn color="secondary" :loading="uploadingLogo" @click="uploadLogoImage" class="mb-4">Logo yuklash</v-btn>
+
           <!-- Hero image -->
           <div class="text-subtitle-2 font-weight-bold mb-2">Hero rasm</div>
           <v-img
@@ -145,8 +167,11 @@ const tab = ref('main')
 const saving = ref(false)
 const uploadingHero = ref(false)
 const uploadingAbout = ref(false)
+const uploadingLogo = ref(false)
+const removingLogo = ref(false)
 const heroImageFile = ref(null)
 const aboutImageFile = ref(null)
+const logoImageFile = ref(null)
 const settings = ref({})
 const features = ref([])
 
@@ -204,6 +229,25 @@ function uploadHeroImage() {
 
 function uploadAboutImage() {
   doUpload('about_image', aboutImageFile.value, uploadingAbout)
+}
+
+function uploadLogoImage() {
+  doUpload('logo_image', logoImageFile.value, uploadingLogo)
+}
+
+async function removeLogo() {
+  removingLogo.value = true
+  try {
+    await api.post('/admin/landing-settings', {
+      settings: [{ key: 'logo_image', value: '' }]
+    })
+    settings.value.logo_image = ''
+    notification.showSuccess('Logo o\'chirildi')
+  } catch {
+    notification.showError('Xato yuz berdi')
+  } finally {
+    removingLogo.value = false
+  }
 }
 
 onMounted(async () => {

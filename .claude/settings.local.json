@@ -6,7 +6,8 @@
       "Bash(npm create:*)",
       "Bash(npm install:*)",
       "Bash(npm run:*)",
-      "Bash(vendor/bin/pint app/Http/Controllers/Api/Admin/AdminBookingController.php --format agent)"
+      "Bash(vendor/bin/pint app/Http/Controllers/Api/Admin/AdminBookingController.php --format agent)",
+      "Bash(python3 -:*)"
     ]
   }
 }

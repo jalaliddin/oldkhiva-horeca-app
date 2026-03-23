@@ -3,8 +3,13 @@
     <!-- Navbar -->
     <v-app-bar color="primary" elevation="0" style="position: fixed; z-index: 100;">
       <v-app-bar-title>
-        <span class="text-white font-weight-bold text-h6">OLDKHIVA</span>
-        <span class="ml-2 text-caption" style="color: #C8941A;">RESTAURANT</span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <img v-if="settings?.logo_image" :src="`/storage/${settings.logo_image}`" alt="OldKhiva" style="height: 40px; object-fit: contain;" />
+          <div style="display: flex; align-items: baseline; gap: 6px;">
+            <span class="text-white font-weight-bold text-h6">{{ settings?.brand_name || 'OLDKHIVA' }}</span>
+            <span class="text-caption" style="color: #C8941A;">{{ settings?.brand_tagline || 'RESTAURANT' }}</span>
+          </div>
+        </div>
       </v-app-bar-title>
       <v-spacer />
       <v-btn variant="text" color="white" href="#top">Bosh sahifa</v-btn>
@@ -18,7 +23,7 @@
         <v-icon start size="small">mdi-bicycle</v-icon>Bicycle
       </v-btn>
       <v-btn color="accent" to="/login" class="ml-2">Kirish</v-btn>
-      <v-btn variant="outlined" color="white" to="/register" class="ml-2 mr-3">Ro'yhatdan o'tish</v-btn>
+      <v-btn variant="outlined" color="white" to="/register" class="ml-2 mr-3">Ro'yxatdan o'tish</v-btn>
     </v-app-bar>
 
     <!-- Hero Section -->
@@ -41,7 +46,7 @@
               {{ settings?.hero_title || 'OldKhiva Restaurant' }}
             </h1>
             <p class="text-h6 mb-8" style="color: #B0BEC5; font-weight: 300;">
-              {{ settings?.hero_subtitle || 'Xiva tarixining ta\'mi' }}
+              {{ settings?.hero_subtitle || "Xiva tarixining ta'mi" }}
             </p>
             <v-btn color="accent" size="x-large" to="/register" class="mr-4">
               <v-icon start>mdi-handshake</v-icon>
@@ -154,14 +159,14 @@
         <v-row justify="center">
           <v-col cols="12" md="8" class="text-center">
             <h2 class="text-h4 font-weight-bold text-white mb-4">
-              {{ settings?.partnership_title || 'Hamkor bo\'ling' }}
+              {{ settings?.partnership_title || "Hamkor bo'ling" }}
             </h2>
             <p class="text-body-1 mb-8" style="color: #B0BEC5;">
               {{ settings?.partnership_text }}
             </p>
             <v-btn color="accent" size="x-large" to="/register">
               <v-icon start>mdi-account-plus</v-icon>
-              Ro'yhatdan o'tish
+              Ro'yxatdan o'tish
             </v-btn>
           </v-col>
         </v-row>
@@ -204,12 +209,15 @@
       <v-container>
         <v-row align="center">
           <v-col cols="12" md="6" class="text-white">
-            <div class="text-h6 font-weight-bold">OLDKHIVA</div>
-            <div class="text-caption" style="color: #B0BEC5;">© 2024 OldKhiva Restaurant. Barcha huquqlar himoyalangan.</div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+              <img v-if="settings?.logo_image" :src="`/storage/${settings.logo_image}`" alt="OldKhiva" style="height: 32px; object-fit: contain; filter: brightness(0) invert(1);" />
+              <div class="text-h6 font-weight-bold">{{ settings?.brand_name || 'OLDKHIVA' }}</div>
+            </div>
+            <div class="text-caption" style="color: #B0BEC5;">© {{ new Date().getFullYear() }} OldKhiva Restaurant. Barcha huquqlar himoyalangan.</div>
           </v-col>
           <v-col cols="12" md="6" class="text-right">
             <v-btn variant="text" color="white" to="/login">Kirish</v-btn>
-            <v-btn variant="text" color="white" to="/register">Ro'yhatdan o'tish</v-btn>
+            <v-btn variant="text" color="white" to="/register">Ro'yxatdan o'tish</v-btn>
           </v-col>
         </v-row>
       </v-container>
