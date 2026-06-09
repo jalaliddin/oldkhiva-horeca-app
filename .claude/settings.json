@@ -21,7 +21,8 @@
       "Bash(npx --yes playwright@1.48 --version)",
       "Read(//tmp/**)",
       "Bash(npm init *)",
-      "Bash(pkill -f \"vite --port 5175\")"
+      "Bash(pkill -f \"vite --port 5175\")",
+      "Bash(curl -s http://localhost:5176/)"
     ]
   }
 }
