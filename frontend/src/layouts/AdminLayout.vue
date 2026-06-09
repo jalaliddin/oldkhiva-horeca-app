@@ -48,6 +48,7 @@
         <span class="text-primary font-weight-medium">Admin Panel</span>
       </v-app-bar-title>
       <v-spacer />
+      <LanguageSwitcher btn-variant="outlined" btn-color="primary" class="mr-2" />
       <v-btn icon="mdi-bell-outline" />
       <v-menu>
         <template #activator="{ props }">
@@ -58,7 +59,7 @@
         <v-list min-width="160">
           <v-list-item :subtitle="auth.user?.email" :title="auth.user?.name" />
           <v-divider />
-          <v-list-item title="Chiqish" prepend-icon="mdi-logout" @click="handleLogout" />
+          <v-list-item :title="i18n.t('common.logout')" prepend-icon="mdi-logout" @click="handleLogout" />
         </v-list>
       </v-menu>
     </v-app-bar>
@@ -76,8 +77,11 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useI18nStore } from '@/stores/i18n'
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 
 const auth = useAuthStore()
+const i18n = useI18nStore()
 const router = useRouter()
 const drawer = ref(true)
 const rail = ref(false)
@@ -87,18 +91,18 @@ const initials = computed(() => {
   return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
 })
 
-const adminNavItems = [
-  { title: 'Dashboard', icon: 'mdi-view-dashboard-outline', to: '/admin' },
-  { title: 'Mijozlar', icon: 'mdi-account-group-outline', to: '/admin/clients' },
-  { title: 'Shartnomalar', icon: 'mdi-file-document-outline', to: '/admin/contracts' },
-  { title: 'Menyu', icon: 'mdi-food-outline', to: '/admin/menu' },
-  { title: 'Xizmatlar', icon: 'mdi-room-service-outline', to: '/admin/services' },
-  { title: 'Bronlar', icon: 'mdi-calendar-check-outline', to: '/admin/bookings' },
-  { title: 'Invoicelar', icon: 'mdi-receipt-text-outline', to: '/admin/invoices' },
-  { title: "To'lovlar", icon: 'mdi-cash-multiple', to: '/admin/payments' },
-  { title: 'Hisobotlar', icon: 'mdi-chart-bar', to: '/admin/reports' },
-  { title: 'Landing Page', icon: 'mdi-web', to: '/admin/landing' },
-]
+const adminNavItems = computed(() => [
+  { title: i18n.t('adminNav.dashboard'), icon: 'mdi-view-dashboard-outline', to: '/admin' },
+  { title: i18n.t('adminNav.clients'), icon: 'mdi-account-group-outline', to: '/admin/clients' },
+  { title: i18n.t('adminNav.contracts'), icon: 'mdi-file-document-outline', to: '/admin/contracts' },
+  { title: i18n.t('adminNav.menu'), icon: 'mdi-food-outline', to: '/admin/menu' },
+  { title: i18n.t('adminNav.services'), icon: 'mdi-room-service-outline', to: '/admin/services' },
+  { title: i18n.t('adminNav.bookings'), icon: 'mdi-calendar-check-outline', to: '/admin/bookings' },
+  { title: i18n.t('adminNav.invoices'), icon: 'mdi-receipt-text-outline', to: '/admin/invoices' },
+  { title: i18n.t('adminNav.payments'), icon: 'mdi-cash-multiple', to: '/admin/payments' },
+  { title: i18n.t('adminNav.reports'), icon: 'mdi-chart-bar', to: '/admin/reports' },
+  { title: i18n.t('adminNav.landingPage'), icon: 'mdi-web', to: '/admin/landing' },
+])
 
 async function handleLogout() {
   await auth.logout()

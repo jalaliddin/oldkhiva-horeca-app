@@ -146,7 +146,7 @@
       <v-container>
         <div class="text-center mb-10">
           <div class="text-overline" style="color: #C8941A;">{{ t('menu.label') }}</div>
-          <h2 class="text-h4 font-weight-bold text-primary mt-2">{{ t('menu.title') }}</h2>
+          <h2 class="text-h4 font-weight-bold text-primary mt-2">{{ t('menu.sectionTitle') }}</h2>
         </div>
         <v-tabs v-model="activeTab" color="accent" class="mb-8" centered>
           <v-tab v-for="cat in menuCategories" :key="cat.id" :value="cat.id">
@@ -290,78 +290,22 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useDisplay } from 'vuetify'
+import { useI18nStore, languages } from '@/stores/i18n'
 import api from '@/plugins/axios'
 
 const { mobile } = useDisplay()
+const i18n = useI18nStore()
 const drawer = ref(false)
 const loading = ref(true)
 const settings = ref({})
 const menuCategories = ref([])
 const activeTab = ref(null)
 
-// ── i18n ──────────────────────────────────────────────────
-const translations = {
-  uz: {
-    nav: { home: 'Bosh sahifa', menu: 'Menyu', about: 'Haqimizda', contact: "Bog'lanish", login: 'Kirish', register: "Ro'yxatdan o'tish" },
-    hero: { location: "XIVA, O'ZBEKISTON", subtitle: "Xiva tarixining ta'mi", partner: "Hamkor bo'ling", viewMenu: "Menyu ko'rish" },
-    features: { label: 'AFZALLIKLARIMIZ', title: 'Nima uchun OldKhiva?' },
-    menu: { label: 'BIZNING MENYU', title: 'Taomlarimiz', currency: "so'm" },
-    about: { label: 'HAQIMIZDA', cta: "Hamkor bo'lish" },
-    cta: { title: "Hamkor bo'ling" },
-    contact: { label: "BOG'LANISH", title: 'Kontakt', phone: 'Telefon', email: 'Email', address: 'Manzil' },
-    footer: { rights: 'Barcha huquqlar himoyalangan.' },
-  },
-  en: {
-    nav: { home: 'Home', menu: 'Menu', about: 'About', contact: 'Contact', login: 'Login', register: 'Register' },
-    hero: { location: 'KHIVA, UZBEKISTAN', subtitle: 'The taste of Khiva history', partner: 'Become a Partner', viewMenu: 'View Menu' },
-    features: { label: 'OUR ADVANTAGES', title: 'Why OldKhiva?' },
-    menu: { label: 'OUR MENU', title: 'Our Dishes', currency: 'UZS' },
-    about: { label: 'ABOUT US', cta: 'Become a Partner' },
-    cta: { title: 'Become a Partner' },
-    contact: { label: 'CONTACT', title: 'Contact Us', phone: 'Phone', email: 'Email', address: 'Address' },
-    footer: { rights: 'All rights reserved.' },
-  },
-  ru: {
-    nav: { home: 'Главная', menu: 'Меню', about: 'О нас', contact: 'Контакт', login: 'Войти', register: 'Регистрация' },
-    hero: { location: 'ХИВА, УЗБЕКИСТАН', subtitle: 'Вкус истории Хивы', partner: 'Стать партнёром', viewMenu: 'Смотреть меню' },
-    features: { label: 'НАШИ ПРЕИМУЩЕСТВА', title: 'Почему OldKhiva?' },
-    menu: { label: 'НАШЕ МЕНЮ', title: 'Наши блюда', currency: 'сум' },
-    about: { label: 'О НАС', cta: 'Стать партнёром' },
-    cta: { title: 'Стать партнёром' },
-    contact: { label: 'КОНТАКТ', title: 'Свяжитесь с нами', phone: 'Телефон', email: 'Email', address: 'Адрес' },
-    footer: { rights: 'Все права защищены.' },
-  },
-  de: {
-    nav: { home: 'Startseite', menu: 'Speisekarte', about: 'Über uns', contact: 'Kontakt', login: 'Anmelden', register: 'Registrieren' },
-    hero: { location: 'CHIWA, USBEKISTAN', subtitle: 'Der Geschmack der Geschichte Chiwas', partner: 'Partner werden', viewMenu: 'Speisekarte ansehen' },
-    features: { label: 'UNSERE VORTEILE', title: 'Warum OldKhiva?' },
-    menu: { label: 'UNSERE SPEISEKARTE', title: 'Unsere Gerichte', currency: 'UZS' },
-    about: { label: 'ÜBER UNS', cta: 'Partner werden' },
-    cta: { title: 'Partner werden' },
-    contact: { label: 'KONTAKT', title: 'Kontaktieren Sie uns', phone: 'Telefon', email: 'E-Mail', address: 'Adresse' },
-    footer: { rights: 'Alle Rechte vorbehalten.' },
-  },
-}
+const locale = computed(() => i18n.locale)
+const currentLang = computed(() => i18n.currentLang)
 
-const languages = [
-  { code: 'uz', label: "O'zbek", flag: '🇺🇿' },
-  { code: 'en', label: 'English', flag: '🇬🇧' },
-  { code: 'ru', label: 'Русский', flag: '🇷🇺' },
-  { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
-]
-
-const locale = ref(localStorage.getItem('lang') || 'uz')
-const currentLang = computed(() => languages.find(l => l.code === locale.value))
-
-function t(key) {
-  return key.split('.').reduce((obj, k) => obj?.[k], translations[locale.value]) ?? key
-}
-
-function setLocale(code) {
-  locale.value = code
-  localStorage.setItem('lang', code)
-}
-// ─────────────────────────────────────────────────────────
+function t(key) { return i18n.t(key) }
+function setLocale(code) { i18n.setLocale(code) }
 
 const features = computed(() => settings.value?.features || [])
 

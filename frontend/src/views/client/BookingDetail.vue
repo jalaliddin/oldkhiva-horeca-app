@@ -2,7 +2,7 @@
   <div>
     <div class="d-flex align-center mb-6">
       <v-btn icon="mdi-arrow-left" variant="text" to="/client/bookings" class="mr-3" />
-      <div class="text-h5 font-weight-bold text-primary">Bron tafsiloti</div>
+      <div class="text-h5 font-weight-bold text-primary">{{ i18n.t('bookingDetail.title') }}</div>
     </div>
 
     <v-row v-if="booking">
@@ -17,15 +17,15 @@
           <v-card-text>
             <v-row>
               <v-col cols="6">
-                <div class="text-caption text-medium-emphasis">Tadbir sanasi</div>
+                <div class="text-caption text-medium-emphasis">{{ i18n.t('bookingDetail.eventDate') }}</div>
                 <div class="font-weight-medium">{{ booking.event_date }}</div>
               </v-col>
               <v-col cols="6">
-                <div class="text-caption text-medium-emphasis">Mehmonlar soni</div>
-                <div class="font-weight-medium">{{ booking.guest_count }} kishi</div>
+                <div class="text-caption text-medium-emphasis">{{ i18n.t('bookingDetail.guestCount') }}</div>
+                <div class="font-weight-medium">{{ booking.guest_count }} {{ i18n.t('bookingDetail.guestSuffix') }}</div>
               </v-col>
               <v-col v-if="booking.notes" cols="12">
-                <div class="text-caption text-medium-emphasis">Izoh</div>
+                <div class="text-caption text-medium-emphasis">{{ i18n.t('bookingDetail.notes') }}</div>
                 <div class="text-body-2">{{ booking.notes }}</div>
               </v-col>
             </v-row>
@@ -33,7 +33,7 @@
         </v-card>
 
         <v-card>
-          <v-card-title class="pa-4">Buyurtma tarkibi</v-card-title>
+          <v-card-title class="pa-4">{{ i18n.t('bookingDetail.orderItems') }}</v-card-title>
           <v-data-table
             :headers="itemHeaders"
             :items="booking.items || []"
@@ -41,16 +41,16 @@
             hide-default-footer
           >
             <template #item.item_price="{ item }">
-              {{ Number(item.item_price).toLocaleString() }} so'm
+              {{ Number(item.item_price).toLocaleString() }} {{ i18n.t('common.currency') }}
             </template>
             <template #item.subtotal="{ item }">
-              {{ Number(item.subtotal).toLocaleString() }} so'm
+              {{ Number(item.subtotal).toLocaleString() }} {{ i18n.t('common.currency') }}
             </template>
           </v-data-table>
           <v-divider />
           <div class="pa-4 text-right">
             <span class="text-h6 font-weight-bold text-primary">
-              Jami: {{ Number(booking.total_amount).toLocaleString() }} so'm
+              {{ i18n.t('common.total') }}: {{ Number(booking.total_amount).toLocaleString() }} {{ i18n.t('common.currency') }}
             </span>
           </div>
         </v-card>
@@ -64,15 +64,10 @@
             <v-chip :color="invoiceStatusColor(booking.invoice.status)" size="small" variant="tonal" class="mb-3">
               {{ invoiceStatusLabel(booking.invoice.status) }}
             </v-chip>
-            <div class="text-body-2 mb-1">Jami: {{ Number(booking.invoice.total_amount).toLocaleString() }} so'm</div>
-            <div class="text-body-2 mb-3">Qoldiq: {{ Number(booking.invoice.balance).toLocaleString() }} so'm</div>
-            <v-btn
-              block
-              color="primary"
-              size="small"
-              :to="`/client/invoices/${booking.invoice.id}`"
-            >
-              Ko'rish
+            <div class="text-body-2 mb-1">{{ i18n.t('common.total') }}: {{ Number(booking.invoice.total_amount).toLocaleString() }} {{ i18n.t('common.currency') }}</div>
+            <div class="text-body-2 mb-3">{{ i18n.t('common.balance') }}: {{ Number(booking.invoice.balance).toLocaleString() }} {{ i18n.t('common.currency') }}</div>
+            <v-btn block color="primary" size="small" :to="`/client/invoices/${booking.invoice.id}`">
+              {{ i18n.t('common.view') }}
             </v-btn>
           </v-card-text>
         </v-card>
@@ -82,32 +77,30 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18nStore } from '@/stores/i18n'
 import api from '@/plugins/axios'
 
 const route = useRoute()
+const i18n = useI18nStore()
 const booking = ref(null)
 
-const itemHeaders = [
-  { title: 'Nomi', key: 'item_name' },
-  { title: 'Narxi', key: 'item_price' },
-  { title: 'Miqdor', key: 'quantity' },
-  { title: 'Jami', key: 'subtotal' },
-]
+const itemHeaders = computed(() => [
+  { title: i18n.t('common.name'), key: 'item_name' },
+  { title: i18n.t('common.price'), key: 'item_price' },
+  { title: i18n.t('common.quantity'), key: 'quantity' },
+  { title: i18n.t('common.total'), key: 'subtotal' },
+])
 
 function statusColor(s) {
   return { pending: 'warning', approved: 'success', rejected: 'error', cancelled: 'grey', completed: 'info' }[s] || 'grey'
 }
-function statusLabel(s) {
-  return { pending: 'Kutilmoqda', approved: 'Tasdiqlangan', rejected: 'Rad etilgan', cancelled: 'Bekor qilindi', completed: 'Tugallandi' }[s] || s
-}
+function statusLabel(s) { return i18n.t(`bookingStatus.${s}`) || s }
 function invoiceStatusColor(s) {
   return { unpaid: 'warning', partial: 'info', paid: 'success', overdue: 'error' }[s] || 'grey'
 }
-function invoiceStatusLabel(s) {
-  return { unpaid: "To'lanmagan", partial: 'Qisman', paid: "To'langan", overdue: 'Muddati o\'tgan' }[s] || s
-}
+function invoiceStatusLabel(s) { return i18n.t(`invoiceStatus.${s}`) || s }
 
 onMounted(async () => {
   const res = await api.get(`/bookings/${route.params.id}`)

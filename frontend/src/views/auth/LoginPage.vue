@@ -1,12 +1,15 @@
 <template>
   <v-card rounded="xl" class="pa-2">
     <v-card-text class="pa-6">
-      <div class="text-h6 font-weight-bold text-primary mb-6">Tizimga kirish</div>
+      <div class="d-flex align-center justify-space-between mb-6">
+        <div class="text-h6 font-weight-bold text-primary">{{ i18n.t('login.title') }}</div>
+        <LanguageSwitcher btn-variant="outlined" btn-color="primary" />
+      </div>
 
       <v-form @submit.prevent="handleLogin">
         <v-text-field
           v-model="form.email"
-          label="Email"
+          :label="i18n.t('login.email')"
           type="email"
           prepend-inner-icon="mdi-email-outline"
           :error-messages="errors.email"
@@ -14,7 +17,7 @@
         />
         <v-text-field
           v-model="form.password"
-          label="Parol"
+          :label="i18n.t('login.password')"
           :type="showPassword ? 'text' : 'password'"
           prepend-inner-icon="mdi-lock-outline"
           :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
@@ -34,14 +37,14 @@
           size="large"
           :loading="loading"
         >
-          Kirish
+          {{ i18n.t('login.submit') }}
         </v-btn>
       </v-form>
 
       <div class="text-center mt-6">
-        <span class="text-body-2 text-medium-emphasis">Hisobingiz yo'qmi? </span>
+        <span class="text-body-2 text-medium-emphasis">{{ i18n.t('login.noAccount') }} </span>
         <v-btn variant="text" color="accent" size="small" to="/register">
-          Ro'yhatdan o'ting
+          {{ i18n.t('login.register') }}
         </v-btn>
       </div>
     </v-card-text>
@@ -53,9 +56,12 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useNotificationStore } from '@/stores/notification'
+import { useI18nStore } from '@/stores/i18n'
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 
 const auth = useAuthStore()
 const notification = useNotificationStore()
+const i18n = useI18nStore()
 const router = useRouter()
 
 const form = ref({ email: '', password: '' })
@@ -70,14 +76,14 @@ async function handleLogin() {
   errorMessage.value = ''
   try {
     const data = await auth.login(form.value)
-    notification.showSuccess('Muvaffaqiyatli kirdingiz!')
+    notification.showSuccess(i18n.t('login.success'))
     const user = data.data.user
     router.push(user.role === 'admin' ? '/admin' : '/client')
   } catch (err) {
     if (err.response?.data?.errors) {
       errors.value = err.response.data.errors
     } else {
-      errorMessage.value = err.response?.data?.message || 'Xato yuz berdi'
+      errorMessage.value = err.response?.data?.message || i18n.t('login.error')
     }
   } finally {
     loading.value = false

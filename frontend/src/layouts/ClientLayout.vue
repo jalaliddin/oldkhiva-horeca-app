@@ -44,9 +44,10 @@
     <v-app-bar elevation="0" color="white" border="b">
       <v-app-bar-nav-icon @click="rail = !rail" />
       <v-app-bar-title>
-        <span class="text-primary font-weight-medium">{{ auth.user?.company_name || 'Kabinet' }}</span>
+        <span class="text-primary font-weight-medium">{{ auth.user?.company_name || i18n.t('clientNav.dashboard') }}</span>
       </v-app-bar-title>
       <v-spacer />
+      <LanguageSwitcher btn-variant="outlined" btn-color="primary" class="mr-2" />
       <v-menu>
         <template #activator="{ props }">
           <v-avatar v-bind="props" color="primary" size="36" class="mr-3 cursor-pointer">
@@ -56,7 +57,7 @@
         <v-list min-width="160">
           <v-list-item :subtitle="auth.user?.email" :title="auth.user?.name" />
           <v-divider />
-          <v-list-item title="Chiqish" prepend-icon="mdi-logout" @click="handleLogout" />
+          <v-list-item :title="i18n.t('common.logout')" prepend-icon="mdi-logout" @click="handleLogout" />
         </v-list>
       </v-menu>
     </v-app-bar>
@@ -73,8 +74,11 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useI18nStore } from '@/stores/i18n'
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 
 const auth = useAuthStore()
+const i18n = useI18nStore()
 const router = useRouter()
 const drawer = ref(true)
 const rail = ref(false)
@@ -84,15 +88,15 @@ const initials = computed(() => {
   return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
 })
 
-const clientNavItems = [
-  { title: 'Bosh sahifa', icon: 'mdi-home-outline', to: '/client' },
-  { title: 'Shartnoma', icon: 'mdi-file-sign', to: '/client/contract' },
-  { title: 'Menyu', icon: 'mdi-food-outline', to: '/client/menu' },
-  { title: 'Bron qilish', icon: 'mdi-calendar-plus-outline', to: '/client/bookings/new' },
-  { title: 'Bronlarim', icon: 'mdi-calendar-text-outline', to: '/client/bookings' },
-  { title: 'Invoicelar', icon: 'mdi-receipt-text-outline', to: '/client/invoices' },
-  { title: "To'lovlar", icon: 'mdi-cash-multiple', to: '/client/payments' },
-]
+const clientNavItems = computed(() => [
+  { title: i18n.t('clientNav.dashboard'), icon: 'mdi-home-outline', to: '/client' },
+  { title: i18n.t('clientNav.contract'), icon: 'mdi-file-sign', to: '/client/contract' },
+  { title: i18n.t('clientNav.menu'), icon: 'mdi-food-outline', to: '/client/menu' },
+  { title: i18n.t('clientNav.newBooking'), icon: 'mdi-calendar-plus-outline', to: '/client/bookings/new' },
+  { title: i18n.t('clientNav.myBookings'), icon: 'mdi-calendar-text-outline', to: '/client/bookings' },
+  { title: i18n.t('clientNav.invoices'), icon: 'mdi-receipt-text-outline', to: '/client/invoices' },
+  { title: i18n.t('clientNav.payments'), icon: 'mdi-cash-multiple', to: '/client/payments' },
+])
 
 async function handleLogout() {
   await auth.logout()

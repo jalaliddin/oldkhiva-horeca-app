@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="text-h5 font-weight-bold text-primary mb-6">Menyu</div>
+    <div class="text-h5 font-weight-bold text-primary mb-6">{{ i18n.t('menu.title') }}</div>
 
     <v-skeleton-loader v-if="loading" type="card" />
 
@@ -28,11 +28,11 @@
               <div v-if="item.description" class="text-caption text-medium-emphasis mb-2">{{ item.description }}</div>
               <div class="d-flex align-center justify-space-between">
                 <span class="text-body-1 font-weight-bold" style="color: #C8941A;">
-                  {{ Number(item.price).toLocaleString() }} so'm
+                  {{ Number(item.price).toLocaleString() }} {{ i18n.t('common.currency') }}
                 </span>
                 <v-chip size="small" color="primary" variant="tonal">{{ item.unit }}</v-chip>
               </div>
-              <div class="text-caption text-medium-emphasis mt-1">Min buyurtma: {{ item.min_order }} {{ item.unit }}</div>
+              <div class="text-caption text-medium-emphasis mt-1">{{ i18n.t('menu.minOrder') }}: {{ item.min_order }} {{ item.unit }}</div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -43,8 +43,10 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useI18nStore } from '@/stores/i18n'
 import api from '@/plugins/axios'
 
+const i18n = useI18nStore()
 const loading = ref(true)
 const categories = ref([])
 const activeTab = ref(null)

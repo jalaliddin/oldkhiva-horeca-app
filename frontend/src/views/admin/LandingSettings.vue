@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="text-h5 font-weight-bold text-primary mb-6">Landing Page Sozlamalari</div>
+    <div class="text-h5 font-weight-bold text-primary mb-6">{{ i18n.t('landingSettings.title') }}</div>
 
     <v-tabs v-model="tab" color="accent" class="mb-6">
       <v-tab value="requisites">
@@ -160,9 +160,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useNotificationStore } from '@/stores/notification'
+import { useI18nStore } from '@/stores/i18n'
 import api from '@/plugins/axios'
 
 const notification = useNotificationStore()
+const i18n = useI18nStore()
 const tab = ref('main')
 const saving = ref(false)
 const uploadingHero = ref(false)

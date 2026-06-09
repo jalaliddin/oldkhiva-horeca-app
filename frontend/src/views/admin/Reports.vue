@@ -1,15 +1,15 @@
 <template>
   <div>
-    <div class="text-h5 font-weight-bold text-primary mb-6">Hisobotlar</div>
+    <div class="text-h5 font-weight-bold text-primary mb-6">{{ i18n.t('reports.title') }}</div>
 
     <v-tabs v-model="tab" color="accent" class="mb-6">
       <v-tab value="clients">
         <v-icon start size="small">mdi-account-group-outline</v-icon>
-        Mijozlar hisoboti
+        {{ i18n.t('reports.clientsReport') }}
       </v-tab>
       <v-tab value="invoices">
         <v-icon start size="small">mdi-receipt-text-outline</v-icon>
-        Invoice hisoboti
+        {{ i18n.t('reports.invoicesReport') }}
       </v-tab>
     </v-tabs>
 
@@ -201,25 +201,25 @@
           <v-col cols="6" sm="4" md="2">
             <v-card class="pa-3 text-center" color="warning" variant="tonal">
               <div class="text-h5 font-weight-bold">{{ invoiceSummary.unpaid }}</div>
-              <div class="text-caption">To'lanmagan</div>
+              <div class="text-caption">{{ i18n.t('invoiceStatus.unpaid') }}</div>
             </v-card>
           </v-col>
           <v-col cols="6" sm="4" md="2">
             <v-card class="pa-3 text-center" color="info" variant="tonal">
               <div class="text-h5 font-weight-bold">{{ invoiceSummary.partial }}</div>
-              <div class="text-caption">Qisman</div>
+              <div class="text-caption">{{ i18n.t('invoiceStatus.partial') }}</div>
             </v-card>
           </v-col>
           <v-col cols="6" sm="4" md="2">
             <v-card class="pa-3 text-center" color="success" variant="tonal">
               <div class="text-h5 font-weight-bold">{{ invoiceSummary.paid }}</div>
-              <div class="text-caption">To'langan</div>
+              <div class="text-caption">{{ i18n.t('invoiceStatus.paid') }}</div>
             </v-card>
           </v-col>
           <v-col cols="6" sm="4" md="2">
             <v-card class="pa-3 text-center" color="error" variant="tonal">
               <div class="text-h5 font-weight-bold">{{ invoiceSummary.overdue }}</div>
-              <div class="text-caption">Muddati o'tgan</div>
+              <div class="text-caption">{{ i18n.t('invoiceStatus.overdue') }}</div>
             </v-card>
           </v-col>
           <v-col cols="6" sm="4" md="2">
@@ -285,7 +285,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useI18nStore } from '@/stores/i18n'
 import api from '@/plugins/axios'
+
+const i18n = useI18nStore()
 
 const tab = ref('clients')
 

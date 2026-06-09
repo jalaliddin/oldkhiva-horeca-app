@@ -1,17 +1,17 @@
 <template>
   <div>
-    <div class="text-h5 font-weight-bold text-primary mb-6">Invoicelar</div>
+    <div class="text-h5 font-weight-bold text-primary mb-6">{{ i18n.t('invoices.title') }}</div>
     <v-card>
       <v-card-text class="pb-0">
-        <v-select v-model="statusFilter" label="Status" :items="statusOptions" hide-details density="compact" clearable class="mb-2" style="max-width: 200px" @update:modelValue="fetchInvoices" />
+        <v-select v-model="statusFilter" :label="i18n.t('common.status')" :items="statusOptions" hide-details density="compact" clearable class="mb-2" style="max-width: 200px" @update:modelValue="fetchInvoices" />
       </v-card-text>
       <v-data-table :headers="headers" :items="invoices" :loading="loading">
         <template #item.client="{ item }">{{ item.client?.company_name }}</template>
         <template #item.status="{ item }">
           <v-chip :color="statusColor(item.status)" size="small" variant="tonal">{{ statusLabel(item.status) }}</v-chip>
         </template>
-        <template #item.total_amount="{ item }">{{ Number(item.total_amount).toLocaleString() }} so'm</template>
-        <template #item.balance="{ item }">{{ Number(item.balance).toLocaleString() }} so'm</template>
+        <template #item.total_amount="{ item }">{{ Number(item.total_amount).toLocaleString() }} {{ i18n.t('common.currency') }}</template>
+        <template #item.balance="{ item }">{{ Number(item.balance).toLocaleString() }} {{ i18n.t('common.currency') }}</template>
         <template #item.actions="{ item }">
           <v-btn size="small" icon="mdi-eye" variant="text" @click="openDetail(item)" />
           <v-btn size="small" icon="mdi-download" variant="text" :loading="downloadingId === item.id" @click="downloadInvoice(item)" />
@@ -31,19 +31,19 @@
         <v-card-text>
           <v-row class="mb-4">
             <v-col cols="6">
-              <div class="text-caption text-medium-emphasis">Mijoz</div>
+              <div class="text-caption text-medium-emphasis">{{ i18n.t('invoices.client') }}</div>
               <div class="font-weight-medium">{{ selectedInvoice.client?.company_name }}</div>
             </v-col>
             <v-col cols="6">
-              <div class="text-caption text-medium-emphasis">Sana</div>
+              <div class="text-caption text-medium-emphasis">{{ i18n.t('invoices.date') }}</div>
               <div>{{ selectedInvoice.created_at?.split('T')[0] }}</div>
             </v-col>
             <v-col cols="6">
-              <div class="text-caption text-medium-emphasis">To'lov muddati</div>
+              <div class="text-caption text-medium-emphasis">{{ i18n.t('invoices.payDue') }}</div>
               <div>{{ selectedInvoice.due_date }}</div>
             </v-col>
             <v-col cols="6">
-              <div class="text-caption text-medium-emphasis">Bron</div>
+              <div class="text-caption text-medium-emphasis">{{ i18n.t('invoices.booking') }}</div>
               <div>{{ selectedInvoice.booking?.booking_number }}</div>
             </v-col>
           </v-row>
@@ -56,35 +56,30 @@
             hide-default-footer
             class="mb-4"
           >
-            <template #item.item_price="{ item }">{{ Number(item.item_price).toLocaleString() }} so'm</template>
-            <template #item.subtotal="{ item }">{{ Number(item.subtotal).toLocaleString() }} so'm</template>
+            <template #item.item_price="{ item }">{{ Number(item.item_price).toLocaleString() }} {{ i18n.t('common.currency') }}</template>
+            <template #item.subtotal="{ item }">{{ Number(item.subtotal).toLocaleString() }} {{ i18n.t('common.currency') }}</template>
           </v-data-table>
 
           <v-divider class="mb-3" />
           <div class="d-flex justify-space-between mb-1">
-            <span>Jami:</span>
-            <span class="font-weight-bold">{{ Number(selectedInvoice.total_amount).toLocaleString() }} so'm</span>
+            <span>{{ i18n.t('common.total') }}:</span>
+            <span class="font-weight-bold">{{ Number(selectedInvoice.total_amount).toLocaleString() }} {{ i18n.t('common.currency') }}</span>
           </div>
           <div class="d-flex justify-space-between mb-1 text-success">
-            <span>To'langan:</span>
-            <span>{{ Number(selectedInvoice.paid_amount).toLocaleString() }} so'm</span>
+            <span>{{ i18n.t('common.paid') }}:</span>
+            <span>{{ Number(selectedInvoice.paid_amount).toLocaleString() }} {{ i18n.t('common.currency') }}</span>
           </div>
           <div class="d-flex justify-space-between font-weight-bold text-error">
-            <span>Qoldiq:</span>
-            <span>{{ Number(selectedInvoice.balance).toLocaleString() }} so'm</span>
+            <span>{{ i18n.t('common.balance') }}:</span>
+            <span>{{ Number(selectedInvoice.balance).toLocaleString() }} {{ i18n.t('common.currency') }}</span>
           </div>
         </v-card-text>
         <v-card-actions class="pa-4">
-          <v-btn
-            color="primary"
-            prepend-icon="mdi-download"
-            :loading="downloadingId === selectedInvoice.id"
-            @click="downloadInvoice(selectedInvoice)"
-          >
-            PDF yuklab olish
+          <v-btn color="primary" prepend-icon="mdi-download" :loading="downloadingId === selectedInvoice.id" @click="downloadInvoice(selectedInvoice)">
+            {{ i18n.t('invoices.downloadPdf') }}
           </v-btn>
           <v-spacer />
-          <v-btn @click="detailDialog = false">Yopish</v-btn>
+          <v-btn @click="detailDialog = false">{{ i18n.t('common.close') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -92,11 +87,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useNotificationStore } from '@/stores/notification'
+import { useI18nStore } from '@/stores/i18n'
 import api from '@/plugins/axios'
 
 const notification = useNotificationStore()
+const i18n = useI18nStore()
 const loading = ref(true)
 const invoices = ref([])
 const statusFilter = ref(null)
@@ -104,41 +101,38 @@ const detailDialog = ref(false)
 const selectedInvoice = ref(null)
 const downloadingId = ref(null)
 
-const statusOptions = [
-  { title: 'Barcha', value: null },
-  { title: "To'lanmagan", value: 'unpaid' },
-  { title: 'Qisman', value: 'partial' },
-  { title: "To'langan", value: 'paid' },
-  { title: "Muddati o'tgan", value: 'overdue' },
-]
+const statusOptions = computed(() => [
+  { title: i18n.t('common.all'), value: null },
+  { title: i18n.t('invoiceStatus.unpaid'), value: 'unpaid' },
+  { title: i18n.t('invoiceStatus.partial'), value: 'partial' },
+  { title: i18n.t('invoiceStatus.paid'), value: 'paid' },
+  { title: i18n.t('invoiceStatus.overdue'), value: 'overdue' },
+])
 
-const headers = [
-  { title: 'Invoice #', key: 'invoice_number' },
-  { title: 'Mijoz', key: 'client' },
-  { title: 'Sana', key: 'created_at' },
-  { title: 'Jami', key: 'total_amount' },
-  { title: 'Qoldiq', key: 'balance' },
-  { title: 'Muddat', key: 'due_date' },
-  { title: 'Status', key: 'status' },
+const headers = computed(() => [
+  { title: i18n.t('invoices.num'), key: 'invoice_number' },
+  { title: i18n.t('invoices.client'), key: 'client' },
+  { title: i18n.t('invoices.date'), key: 'created_at' },
+  { title: i18n.t('common.total'), key: 'total_amount' },
+  { title: i18n.t('common.balance'), key: 'balance' },
+  { title: i18n.t('invoices.dueDate'), key: 'due_date' },
+  { title: i18n.t('common.status'), key: 'status' },
   { title: '', key: 'actions', sortable: false },
-]
+])
 
-const itemHeaders = [
-  { title: 'Nomi', key: 'item_name' },
-  { title: 'Narxi', key: 'item_price' },
-  { title: 'Miqdor', key: 'quantity' },
-  { title: 'Jami', key: 'subtotal' },
-]
+const itemHeaders = computed(() => [
+  { title: i18n.t('common.name'), key: 'item_name' },
+  { title: i18n.t('common.price'), key: 'item_price' },
+  { title: i18n.t('common.quantity'), key: 'quantity' },
+  { title: i18n.t('common.total'), key: 'subtotal' },
+])
 
 function statusColor(s) {
   return { unpaid: 'warning', partial: 'info', paid: 'success', overdue: 'error' }[s] || 'grey'
 }
-function statusLabel(s) {
-  return { unpaid: "To'lanmagan", partial: 'Qisman', paid: "To'langan", overdue: "Muddati o'tgan" }[s] || s
-}
+function statusLabel(s) { return i18n.t(`invoiceStatus.${s}`) || s }
 
 async function openDetail(invoice) {
-  // Load full detail with booking items
   const res = await api.get(`/admin/invoices/${invoice.id}`)
   selectedInvoice.value = res.data.data
   detailDialog.value = true
@@ -155,7 +149,7 @@ async function downloadInvoice(invoice) {
     link.click()
     URL.revokeObjectURL(url)
   } catch {
-    notification.showError('Fayl topilmadi yoki hali yaratilmagan')
+    notification.showError(i18n.t('invoices.fileNotFound'))
   } finally {
     downloadingId.value = null
   }
