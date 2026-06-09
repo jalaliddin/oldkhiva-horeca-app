@@ -3,17 +3,217 @@
     <div class="text-h5 font-weight-bold text-primary mb-6">{{ i18n.t('landingSettings.title') }}</div>
 
     <v-tabs v-model="tab" color="accent" class="mb-6">
+      <v-tab value="main">
+        <v-icon start size="small">mdi-home</v-icon>
+        Asosiy
+      </v-tab>
+      <v-tab value="about">
+        <v-icon start size="small">mdi-information</v-icon>
+        Haqimizda
+      </v-tab>
+      <v-tab value="features">
+        <v-icon start size="small">mdi-star</v-icon>
+        Xususiyatlar
+      </v-tab>
+      <v-tab value="contact">
+        <v-icon start size="small">mdi-phone</v-icon>
+        Kontakt
+      </v-tab>
       <v-tab value="requisites">
         <v-icon start size="small">mdi-bank</v-icon>
         Rekvizitlar (PDF)
       </v-tab>
-      <v-tab value="main">Asosiy</v-tab>
-      <v-tab value="about">Haqimizda</v-tab>
-      <v-tab value="contact">Kontakt</v-tab>
-      <v-tab value="features">Xususiyatlar</v-tab>
     </v-tabs>
 
     <v-window v-model="tab">
+
+      <!-- Main -->
+      <v-window-item value="main">
+        <v-card class="pa-4">
+          <!-- Language selector -->
+          <div class="d-flex align-center gap-2 mb-5">
+            <v-icon size="small" color="primary" class="mr-1">mdi-translate</v-icon>
+            <span class="text-body-2 font-weight-medium mr-3">Til:</span>
+            <v-btn-toggle v-model="contentLang" mandatory density="compact" color="primary">
+              <v-btn v-for="lang in langs" :key="lang.code" :value="lang.code" size="small">
+                {{ lang.flag }} {{ lang.code.toUpperCase() }}
+              </v-btn>
+            </v-btn-toggle>
+          </div>
+
+          <v-alert v-if="contentLang !== 'uz'" type="info" variant="tonal" density="compact" class="mb-4" rounded="lg">
+            Uzb (asosiy) versiyada maydon bo'sh bo'lsa, tanlangan til matni ko'rsatiladi.
+          </v-alert>
+
+          <div class="text-subtitle-2 text-primary font-weight-bold mb-3">
+            Hero bo'limi
+          </div>
+          <v-text-field
+            v-model="settings[sk('hero_title')]"
+            :label="`Hero sarlavha (${contentLang.toUpperCase()})`"
+            class="mb-3"
+          />
+          <v-text-field
+            v-model="settings[sk('hero_subtitle')]"
+            :label="`Hero subtitle (${contentLang.toUpperCase()})`"
+            class="mb-4"
+          />
+
+          <div class="text-subtitle-2 text-primary font-weight-bold mb-3">
+            Hamkorlik bo'limi
+          </div>
+          <v-text-field
+            v-model="settings[sk('partnership_title')]"
+            :label="`Hamkorlik sarlavhasi (${contentLang.toUpperCase()})`"
+            class="mb-3"
+          />
+          <v-textarea
+            v-model="settings[sk('partnership_text')]"
+            :label="`Hamkorlik matni (${contentLang.toUpperCase()})`"
+            rows="3"
+            class="mb-4"
+          />
+
+          <v-divider class="mb-4" />
+
+          <!-- Brand (only uz) -->
+          <div class="text-subtitle-2 font-weight-bold mb-2">Brend nomi (navbar va footer)</div>
+          <v-row dense class="mb-4">
+            <v-col cols="12" md="6">
+              <v-text-field v-model="settings.brand_name" label="Asosiy nom (masalan: OLDKHIVA)" density="compact" />
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field v-model="settings.brand_tagline" label="Qo'shimcha (masalan: RESTAURANT)" density="compact" />
+            </v-col>
+          </v-row>
+
+          <!-- Show menu prices toggle -->
+          <v-switch
+            v-model="showMenuPrices"
+            label="Menyuda narxlarni ko'rsatish"
+            color="primary"
+            class="mb-4"
+            @update:modelValue="v => settings.show_menu_prices = v"
+          />
+
+          <!-- Logo -->
+          <div class="text-subtitle-2 font-weight-bold mb-2">Logo</div>
+          <div v-if="settings.logo_image" class="d-flex align-center gap-3 mb-3">
+            <v-img :src="`/storage/${settings.logo_image}`" height="60" max-width="200" contain class="bg-grey-lighten-4 rounded-lg flex-grow-0" style="border: 1px solid #eee;" />
+            <v-btn color="error" variant="tonal" size="small" :loading="removingLogo" @click="removeLogo">
+              <v-icon start size="small">mdi-delete</v-icon>O'chirish
+            </v-btn>
+          </div>
+          <v-file-input v-model="logoImageFile" label="Logo yuklash (PNG/SVG)" accept="image/*" prepend-icon="mdi-image" class="mb-2" />
+          <v-btn color="secondary" :loading="uploadingLogo" @click="uploadLogoImage" class="mb-4">Logo yuklash</v-btn>
+
+          <!-- Hero image -->
+          <div class="text-subtitle-2 font-weight-bold mb-2">Hero rasm</div>
+          <v-img v-if="settings.hero_image" :src="`/storage/${settings.hero_image}`" height="160" cover rounded="lg" class="mb-3" />
+          <v-file-input v-model="heroImageFile" label="Hero rasm yuklash" accept="image/*" prepend-icon="mdi-image" class="mb-3" />
+          <v-row>
+            <v-col>
+              <v-btn color="secondary" :loading="uploadingHero" @click="uploadHeroImage">Rasmni yuklash</v-btn>
+            </v-col>
+            <v-col class="text-right">
+              <v-btn color="primary" :loading="saving" @click="saveSettings">Saqlash</v-btn>
+            </v-col>
+          </v-row>
+        </v-card>
+      </v-window-item>
+
+      <!-- About -->
+      <v-window-item value="about">
+        <v-card class="pa-4">
+          <!-- Language selector -->
+          <div class="d-flex align-center gap-2 mb-5">
+            <v-icon size="small" color="primary" class="mr-1">mdi-translate</v-icon>
+            <span class="text-body-2 font-weight-medium mr-3">Til:</span>
+            <v-btn-toggle v-model="contentLang" mandatory density="compact" color="primary">
+              <v-btn v-for="lang in langs" :key="lang.code" :value="lang.code" size="small">
+                {{ lang.flag }} {{ lang.code.toUpperCase() }}
+              </v-btn>
+            </v-btn-toggle>
+          </div>
+
+          <v-textarea
+            v-model="settings[sk('about_text')]"
+            :label="`Haqimizda matni (${contentLang.toUpperCase()})`"
+            rows="6"
+            class="mb-4"
+          />
+
+          <!-- About image -->
+          <div class="text-subtitle-2 font-weight-bold mb-2">Haqimizda rasmi</div>
+          <v-img v-if="settings.about_image" :src="`/storage/${settings.about_image}`" height="200" cover rounded="lg" class="mb-3" />
+          <v-file-input v-model="aboutImageFile" label="Rasm yuklash" accept="image/*" prepend-icon="mdi-image" class="mb-3" />
+          <v-row>
+            <v-col>
+              <v-btn color="secondary" :loading="uploadingAbout" @click="uploadAboutImage">Rasmni yuklash</v-btn>
+            </v-col>
+            <v-col class="text-right">
+              <v-btn color="primary" :loading="saving" @click="saveSettings">Saqlash</v-btn>
+            </v-col>
+          </v-row>
+        </v-card>
+      </v-window-item>
+
+      <!-- Features -->
+      <v-window-item value="features">
+        <v-card class="pa-4">
+          <!-- Language selector -->
+          <div class="d-flex align-center gap-2 mb-5">
+            <v-icon size="small" color="primary" class="mr-1">mdi-translate</v-icon>
+            <span class="text-body-2 font-weight-medium mr-3">Til:</span>
+            <v-btn-toggle v-model="contentLang" mandatory density="compact" color="primary">
+              <v-btn v-for="lang in langs" :key="lang.code" :value="lang.code" size="small">
+                {{ lang.flag }} {{ lang.code.toUpperCase() }}
+              </v-btn>
+            </v-btn-toggle>
+          </div>
+
+          <div v-for="(feature, idx) in features" :key="idx" class="mb-4 pa-3" style="border: 1px solid #eee; border-radius: 8px;">
+            <div class="text-caption mb-2 font-weight-medium">Xususiyat {{ idx + 1 }}</div>
+            <v-row dense>
+              <v-col cols="12" md="3">
+                <v-text-field v-model="feature.icon" label="Icon (mdi-...)" density="compact" hide-details />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-text-field
+                  v-model="feature[fk('title')]"
+                  :label="`Sarlavha (${contentLang.toUpperCase()})`"
+                  density="compact"
+                  hide-details
+                />
+              </v-col>
+              <v-col cols="12" md="5">
+                <v-text-field
+                  v-model="feature[fk('text')]"
+                  :label="`Matn (${contentLang.toUpperCase()})`"
+                  density="compact"
+                  hide-details
+                />
+              </v-col>
+            </v-row>
+          </div>
+
+          <div class="d-flex gap-2">
+            <v-btn variant="outlined" prepend-icon="mdi-plus" @click="addFeature">Yangi xususiyat</v-btn>
+            <v-btn color="primary" :loading="saving" @click="saveFeaturesSettings">Saqlash</v-btn>
+          </div>
+        </v-card>
+      </v-window-item>
+
+      <!-- Contact -->
+      <v-window-item value="contact">
+        <v-card class="pa-4">
+          <v-text-field v-model="settings.contact_phone" label="Telefon" class="mb-3" />
+          <v-text-field v-model="settings.contact_email" label="Email" class="mb-3" />
+          <v-text-field v-model="settings.contact_address" label="Manzil" class="mb-4" />
+          <v-btn color="primary" :loading="saving" @click="saveSettings">Saqlash</v-btn>
+        </v-card>
+      </v-window-item>
+
       <!-- Requisites (PDF) -->
       <v-window-item value="requisites">
         <v-card class="pa-4">
@@ -44,128 +244,20 @@
         </v-card>
       </v-window-item>
 
-      <!-- Main -->
-      <v-window-item value="main">
-        <v-card class="pa-4">
-          <v-text-field v-model="settings.hero_title" label="Hero sarlavha" class="mb-3" />
-          <v-text-field v-model="settings.hero_subtitle" label="Hero subtitle" class="mb-3" />
-          <v-text-field v-model="settings.partnership_title" label="Hamkorlik sarlavhasi" class="mb-3" />
-          <v-textarea v-model="settings.partnership_text" label="Hamkorlik matni" rows="3" class="mb-4" />
-
-          <!-- Brand text -->
-          <div class="text-subtitle-2 font-weight-bold mb-2">Brend nomi (navbar va footer)</div>
-          <v-row dense class="mb-4">
-            <v-col cols="12" md="6">
-              <v-text-field v-model="settings.brand_name" label="Asosiy nom (masalan: OLDKHIVA)" density="compact" />
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-text-field v-model="settings.brand_tagline" label="Qo'shimcha (masalan: RESTAURANT)" density="compact" />
-            </v-col>
-          </v-row>
-
-          <!-- Logo -->
-          <div class="text-subtitle-2 font-weight-bold mb-2">Logo</div>
-          <div v-if="settings.logo_image" class="d-flex align-center gap-3 mb-3">
-            <v-img :src="`/storage/${settings.logo_image}`" height="60" max-width="200" contain class="bg-grey-lighten-4 rounded-lg flex-grow-0" style="border: 1px solid #eee;" />
-            <v-btn color="error" variant="tonal" size="small" :loading="removingLogo" @click="removeLogo">
-              <v-icon start size="small">mdi-delete</v-icon>O'chirish
-            </v-btn>
-          </div>
-          <v-file-input v-model="logoImageFile" label="Logo yuklash (PNG/SVG)" accept="image/*" prepend-icon="mdi-image" class="mb-2" />
-          <v-btn color="secondary" :loading="uploadingLogo" @click="uploadLogoImage" class="mb-4">Logo yuklash</v-btn>
-
-          <!-- Hero image -->
-          <div class="text-subtitle-2 font-weight-bold mb-2">Hero rasm</div>
-          <v-img
-            v-if="settings.hero_image"
-            :src="`/storage/${settings.hero_image}`"
-            height="160"
-            cover
-            rounded="lg"
-            class="mb-3"
-          />
-          <v-file-input v-model="heroImageFile" label="Hero rasm yuklash" accept="image/*" prepend-icon="mdi-image" class="mb-3" />
-          <v-row>
-            <v-col>
-              <v-btn color="secondary" :loading="uploadingHero" @click="uploadHeroImage">Rasmni yuklash</v-btn>
-            </v-col>
-            <v-col class="text-right">
-              <v-btn color="primary" :loading="saving" @click="saveSettings">Saqlash</v-btn>
-            </v-col>
-          </v-row>
-        </v-card>
-      </v-window-item>
-
-      <!-- About -->
-      <v-window-item value="about">
-        <v-card class="pa-4">
-          <v-textarea v-model="settings.about_text" label="Haqimizda matni" rows="6" class="mb-4" />
-
-          <!-- About image -->
-          <div class="text-subtitle-2 font-weight-bold mb-2">Haqimizda rasmi</div>
-          <v-img
-            v-if="settings.about_image"
-            :src="`/storage/${settings.about_image}`"
-            height="200"
-            cover
-            rounded="lg"
-            class="mb-3"
-          />
-          <v-file-input v-model="aboutImageFile" label="Rasm yuklash" accept="image/*" prepend-icon="mdi-image" class="mb-3" />
-          <v-row>
-            <v-col>
-              <v-btn color="secondary" :loading="uploadingAbout" @click="uploadAboutImage">Rasmni yuklash</v-btn>
-            </v-col>
-            <v-col class="text-right">
-              <v-btn color="primary" :loading="saving" @click="saveSettings">Saqlash</v-btn>
-            </v-col>
-          </v-row>
-        </v-card>
-      </v-window-item>
-
-      <!-- Contact -->
-      <v-window-item value="contact">
-        <v-card class="pa-4">
-          <v-text-field v-model="settings.contact_phone" label="Telefon" class="mb-3" />
-          <v-text-field v-model="settings.contact_email" label="Email" class="mb-3" />
-          <v-text-field v-model="settings.contact_address" label="Manzil" class="mb-4" />
-          <v-btn color="primary" :loading="saving" @click="saveSettings">Saqlash</v-btn>
-        </v-card>
-      </v-window-item>
-
-      <!-- Features -->
-      <v-window-item value="features">
-        <v-card class="pa-4">
-          <div v-for="(feature, idx) in features" :key="idx" class="mb-4 pa-3" style="border: 1px solid #eee; border-radius: 8px;">
-            <div class="text-caption mb-2">Xususiyat {{ idx + 1 }}</div>
-            <v-row dense>
-              <v-col cols="12" md="4">
-                <v-text-field v-model="feature.icon" label="Icon (mdi-...)" density="compact" />
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-text-field v-model="feature.title" label="Sarlavha" density="compact" />
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-text-field v-model="feature.text" label="Matn" density="compact" />
-              </v-col>
-            </v-row>
-          </div>
-          <v-btn color="primary" :loading="saving" @click="saveFeaturesSettings">Saqlash</v-btn>
-        </v-card>
-      </v-window-item>
     </v-window>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useNotificationStore } from '@/stores/notification'
-import { useI18nStore } from '@/stores/i18n'
+import { useI18nStore, languages } from '@/stores/i18n'
 import api from '@/plugins/axios'
 
 const notification = useNotificationStore()
 const i18n = useI18nStore()
 const tab = ref('main')
+const contentLang = ref('uz')
 const saving = ref(false)
 const uploadingHero = ref(false)
 const uploadingAbout = ref(false)
@@ -177,11 +269,32 @@ const logoImageFile = ref(null)
 const settings = ref({})
 const features = ref([])
 
+const langs = languages
+
+const showMenuPrices = computed({
+  get: () => settings.value.show_menu_prices !== false && settings.value.show_menu_prices !== 'false',
+  set: (v) => { settings.value.show_menu_prices = v },
+})
+
+// Settings key for current language: uz uses base key, others use key_lang
+function sk(base) {
+  return contentLang.value === 'uz' ? base : `${base}_${contentLang.value}`
+}
+
+// Feature field key for current language
+function fk(base) {
+  return contentLang.value === 'uz' ? base : `${base}_${contentLang.value}`
+}
+
+function addFeature() {
+  features.value.push({ icon: 'mdi-star', title: '', text: '' })
+}
+
 async function saveSettings() {
   saving.value = true
   try {
     const settingsToSave = Object.entries(settings.value)
-      .filter(([key]) => !['features', 'gallery_images'].includes(key))
+      .filter(([key]) => !['features'].includes(key))
       .map(([key, value]) => ({ key, value }))
 
     await api.post('/admin/landing-settings', { settings: settingsToSave })
@@ -225,26 +338,16 @@ async function doUpload(key, fileRaw, loadingRef) {
   }
 }
 
-function uploadHeroImage() {
-  doUpload('hero_image', heroImageFile.value, uploadingHero)
-}
-
-function uploadAboutImage() {
-  doUpload('about_image', aboutImageFile.value, uploadingAbout)
-}
-
-function uploadLogoImage() {
-  doUpload('logo_image', logoImageFile.value, uploadingLogo)
-}
+function uploadHeroImage() { doUpload('hero_image', heroImageFile.value, uploadingHero) }
+function uploadAboutImage() { doUpload('about_image', aboutImageFile.value, uploadingAbout) }
+function uploadLogoImage() { doUpload('logo_image', logoImageFile.value, uploadingLogo) }
 
 async function removeLogo() {
   removingLogo.value = true
   try {
-    await api.post('/admin/landing-settings', {
-      settings: [{ key: 'logo_image', value: '' }]
-    })
+    await api.post('/admin/landing-settings', { settings: [{ key: 'logo_image', value: '' }] })
     settings.value.logo_image = ''
-    notification.showSuccess('Logo o\'chirildi')
+    notification.showSuccess("Logo o'chirildi")
   } catch {
     notification.showError('Xato yuz berdi')
   } finally {

@@ -1,7 +1,27 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep -E '\\\\.\\(js|jsx|ts|tsx|vue|json\\)$')"
+      "Bash(grep -E '\\\\.\\(js|jsx|ts|tsx|vue|json\\)$')",
+      "Bash(curl -s http://localhost:8091/api/landing)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\)['data']['settings']; keys=[k for k in d if 'hero' in k or 'about' in k or 'partner' in k or 'feature' in k]; print\\(json.dumps\\({k:str\\(d[k]\\)[:60] for k in keys}, ensure_ascii=False, indent=2\\)\\)\")",
+      "Bash(curl -v http://localhost:8091/)",
+      "Bash(docker compose *)",
+      "Bash(curl -s http://localhost:5175/)",
+      "Bash(pip show *)",
+      "Bash(python3 -c \"from playwright.sync_api import sync_playwright; print\\('ok'\\)\")",
+      "Bash(python3 -c \"from playwright.sync_api import sync_playwright; print\\('playwright ok'\\)\")",
+      "Bash(pip install *)",
+      "Bash(python3 -m playwright install chromium)",
+      "Bash(pip3 install *)",
+      "Bash(npx playwright *)",
+      "Bash(cat)",
+      "Bash(node /tmp/verify_landing.mjs)",
+      "Bash(find /home/eversoft/.cache/ms-playwright -name \"*.js\" 2>/dev/null | head -3; ls /home/eversoft/.cache/ms-playwright/ 2>/dev/null)",
+      "Read(//home/eversoft/.cache/ms-playwright/**)",
+      "Bash(npx --yes playwright@1.48 --version)",
+      "Read(//tmp/**)",
+      "Bash(npm init *)",
+      "Bash(pkill -f \"vite --port 5175\")"
     ]
   }
 }

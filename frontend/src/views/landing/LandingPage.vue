@@ -105,10 +105,10 @@
           <v-col cols="12" md="8" class="text-center">
             <div class="text-overline mb-4" style="color: #C8941A; letter-spacing: 4px;">{{ t('hero.location') }}</div>
             <h1 class="text-white font-weight-bold mb-4" style="font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1.1;">
-              {{ settings?.hero_title || 'OldKhiva Restaurant' }}
+              {{ ls('hero_title') || 'OldKhiva Restaurant' }}
             </h1>
             <p class="text-h6 mb-8" style="color: #B0BEC5; font-weight: 300;">
-              {{ settings?.hero_subtitle || t('hero.subtitle') }}
+              {{ ls('hero_subtitle') || t('hero.subtitle') }}
             </p>
             <v-btn color="accent" size="x-large" to="/register" class="mr-4">
               <v-icon start>mdi-handshake</v-icon>
@@ -130,11 +130,11 @@
           <h2 class="text-h4 font-weight-bold text-primary mt-2">{{ t('features.title') }}</h2>
         </div>
         <v-row>
-          <v-col v-for="feature in features" :key="feature.title" cols="12" md="4">
+          <v-col v-for="(feature, idx) in features" :key="idx" cols="12" md="4">
             <v-card height="100%" class="pa-6 text-center">
               <v-icon :icon="feature.icon" size="56" color="accent" class="mb-4" />
-              <v-card-title class="text-h6 text-primary">{{ feature.title }}</v-card-title>
-              <v-card-text class="text-body-2">{{ feature.text }}</v-card-text>
+              <v-card-title class="text-h6 text-primary">{{ lf(feature, 'title') }}</v-card-title>
+              <v-card-text class="text-body-2">{{ lf(feature, 'text') }}</v-card-text>
             </v-card>
           </v-col>
         </v-row>
@@ -148,39 +148,69 @@
           <div class="text-overline" style="color: #C8941A;">{{ t('menu.label') }}</div>
           <h2 class="text-h4 font-weight-bold text-primary mt-2">{{ t('menu.sectionTitle') }}</h2>
         </div>
-        <v-tabs v-model="activeTab" color="accent" class="mb-8" centered>
+        <v-tabs v-model="activeTab" color="accent" class="mb-8" centered @update:modelValue="onCategoryChange">
           <v-tab v-for="cat in menuCategories" :key="cat.id" :value="cat.id">
             {{ cat.name }}
           </v-tab>
         </v-tabs>
-        <v-row>
-          <v-col
-            v-for="item in currentMenuItems"
-            :key="item.id"
-            cols="12" sm="6" md="3"
-          >
-            <v-card>
-              <v-img
-                v-if="item.image"
-                :src="`/storage/${item.image}`"
-                height="160"
-                cover
-              />
-              <v-img
-                v-else
-                src="https://placehold.co/300x160/1A2744/C8941A?text=OldKhiva"
-                height="160"
-                cover
-              />
-              <v-card-title class="text-body-1">{{ item.name }}</v-card-title>
-              <v-card-subtitle v-if="settings?.show_menu_prices !== false">
-                <span style="color: #C8941A; font-weight: bold;">
-                  {{ Number(item.price).toLocaleString('uz-UZ') }} {{ t('menu.currency') }}
-                </span>
-              </v-card-subtitle>
-            </v-card>
-          </v-col>
-        </v-row>
+
+        <!-- Carousel -->
+        <div v-if="menuPages.length" class="position-relative">
+          <v-window v-model="menuPage" :touch="{ left: nextPage, right: prevPage }">
+            <v-window-item v-for="(page, pageIdx) in menuPages" :key="pageIdx">
+              <v-row>
+                <v-col
+                  v-for="item in page"
+                  :key="item.id"
+                  cols="12" sm="6" md="3"
+                >
+                  <v-card>
+                    <v-img
+                      :src="item.image ? `/storage/${item.image}` : 'https://placehold.co/300x160/1A2744/C8941A?text=OldKhiva'"
+                      height="160"
+                      cover
+                    />
+                    <v-card-title class="text-body-1">{{ item.name }}</v-card-title>
+                    <v-card-subtitle v-if="settings?.show_menu_prices !== false">
+                      <span style="color: #C8941A; font-weight: bold;">
+                        {{ Number(item.price).toLocaleString('uz-UZ') }} {{ t('menu.currency') }}
+                      </span>
+                    </v-card-subtitle>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </v-window-item>
+          </v-window>
+
+          <!-- Controls -->
+          <div class="d-flex align-center justify-center mt-6 gap-2">
+            <v-btn
+              icon="mdi-chevron-left"
+              variant="outlined"
+              color="primary"
+              size="small"
+              @click="prevPage"
+            />
+            <v-btn
+              v-for="(_, idx) in menuPages"
+              :key="idx"
+              icon
+              size="x-small"
+              :color="menuPage === idx ? 'accent' : 'grey-lighten-1'"
+              :variant="menuPage === idx ? 'flat' : 'text'"
+              @click="goToPage(idx)"
+            >
+              <v-icon size="10">mdi-circle</v-icon>
+            </v-btn>
+            <v-btn
+              icon="mdi-chevron-right"
+              variant="outlined"
+              color="primary"
+              size="small"
+              @click="nextPage"
+            />
+          </div>
+        </div>
       </v-container>
     </section>
 
@@ -192,7 +222,7 @@
             <div class="text-overline mb-2" style="color: #C8941A;">{{ t('about.label') }}</div>
             <h2 class="text-h4 font-weight-bold text-primary mb-4">OldKhiva Restaurant</h2>
             <p class="text-body-1" style="color: #555; line-height: 1.8;">
-              {{ settings?.about_text }}
+              {{ ls('about_text') }}
             </p>
             <v-btn color="primary" class="mt-6" to="/register">
               {{ t('about.cta') }}
@@ -221,10 +251,10 @@
         <v-row justify="center">
           <v-col cols="12" md="8" class="text-center">
             <h2 class="text-h4 font-weight-bold text-white mb-4">
-              {{ settings?.partnership_title || t('cta.title') }}
+              {{ ls('partnership_title') || t('cta.title') }}
             </h2>
             <p class="text-body-1 mb-8" style="color: #B0BEC5;">
-              {{ settings?.partnership_text }}
+              {{ ls('partnership_text') }}
             </p>
             <v-btn color="accent" size="x-large" to="/register">
               <v-icon start>mdi-account-plus</v-icon>
@@ -288,7 +318,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 import { useI18nStore, languages } from '@/stores/i18n'
 import api from '@/plugins/axios'
@@ -301,11 +331,28 @@ const settings = ref({})
 const menuCategories = ref([])
 const activeTab = ref(null)
 
+// Carousel state
+const menuPage = ref(0)
+const ITEMS_PER_PAGE = 4
+let carouselTimer = null
+
 const locale = computed(() => i18n.locale)
 const currentLang = computed(() => i18n.currentLang)
 
 function t(key) { return i18n.t(key) }
 function setLocale(code) { i18n.setLocale(code) }
+
+function ls(key) {
+  const loc = i18n.locale
+  if (loc === 'uz') return settings.value?.[key] ?? ''
+  return settings.value?.[`${key}_${loc}`] || settings.value?.[key] || ''
+}
+
+function lf(feature, key) {
+  const loc = i18n.locale
+  if (loc === 'uz') return feature[key] ?? ''
+  return feature[`${key}_${loc}`] || feature[key] || ''
+}
 
 const features = computed(() => settings.value?.features || [])
 
@@ -314,6 +361,58 @@ const currentMenuItems = computed(() => {
   const cat = menuCategories.value.find(c => c.id === activeTab.value)
   return cat?.items || []
 })
+
+const menuPages = computed(() => {
+  const items = currentMenuItems.value
+  if (!items.length) return []
+  const pages = []
+  for (let i = 0; i < items.length; i += ITEMS_PER_PAGE) {
+    pages.push(items.slice(i, i + ITEMS_PER_PAGE))
+  }
+  return pages
+})
+
+function nextPage() {
+  if (!menuPages.value.length) return
+  menuPage.value = (menuPage.value + 1) % menuPages.value.length
+}
+
+function prevPage() {
+  if (!menuPages.value.length) return
+  menuPage.value = (menuPage.value - 1 + menuPages.value.length) % menuPages.value.length
+}
+
+function goToPage(idx) {
+  menuPage.value = idx
+  restartCarousel()
+}
+
+function startCarousel() {
+  clearInterval(carouselTimer)
+  if (menuPages.value.length > 1) {
+    carouselTimer = setInterval(nextPage, 3500)
+  }
+}
+
+function restartCarousel() {
+  clearInterval(carouselTimer)
+  if (menuPages.value.length > 1) {
+    carouselTimer = setInterval(nextPage, 3500)
+  }
+}
+
+function onCategoryChange() {
+  menuPage.value = 0
+  restartCarousel()
+}
+
+// Restart carousel when pages change (category switch)
+watch(menuPages, () => {
+  menuPage.value = 0
+  restartCarousel()
+})
+
+onUnmounted(() => clearInterval(carouselTimer))
 
 onMounted(async () => {
   try {
@@ -325,6 +424,7 @@ onMounted(async () => {
     }
   } finally {
     loading.value = false
+    startCarousel()
   }
 })
 </script>
