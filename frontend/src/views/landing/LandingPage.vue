@@ -85,8 +85,8 @@
     <!-- ─── Hero ─── -->
     <section class="hero-section"
       :style="settings?.hero_image
-        ? `background-image: linear-gradient(135deg,rgba(15,28,53,0.85) 0%,rgba(15,28,53,0.6) 100%), url('/storage/${settings.hero_image}') center/cover no-repeat`
-        : undefined">
+        ? { background: `linear-gradient(rgba(15,28,53,0.82), rgba(15,28,53,0.72)), url('/storage/${settings.hero_image}') center/cover no-repeat` }
+        : {}">
       <div class="hero-pattern" />
       <v-container style="position:relative;z-index:2">
         <v-row align="center" style="min-height:calc(100vh - 80px)">
