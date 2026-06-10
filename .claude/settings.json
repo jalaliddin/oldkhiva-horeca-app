@@ -22,7 +22,8 @@
       "Read(//tmp/**)",
       "Bash(npm init *)",
       "Bash(pkill -f \"vite --port 5175\")",
-      "Bash(curl -s http://localhost:5176/)"
+      "Bash(curl -s http://localhost:5176/)",
+      "Bash(vendor/bin/pint app/Http/Controllers/Api/Admin/AdminMenuItemController.php --format agent)"
     ]
   }
 }

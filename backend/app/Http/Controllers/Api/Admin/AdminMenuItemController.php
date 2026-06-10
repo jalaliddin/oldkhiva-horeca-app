@@ -12,7 +12,7 @@ class AdminMenuItemController extends Controller
 {
     public function index(): JsonResponse
     {
-        $items = MenuItem::with('category')->orderBy('sort_order')->paginate(20);
+        $items = MenuItem::with('category')->orderBy('sort_order')->get();
 
         return response()->json(['success' => true, 'data' => $items]);
     }
